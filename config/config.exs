@@ -31,6 +31,11 @@ config :that_app, ThatAppWeb.Endpoint,
 # at the `config/runtime.exs`.
 config :that_app, ThatApp.Mailer, adapter: Swoosh.Adapters.Local
 
+config :that_app, ThatAppWeb.Auth.Guardian,
+  issuer: "that_app",
+  secret_key: ""
+
+config :bcrypt_elixir, log_rounds: 4
 # Configure esbuild (the version is required)
 config :esbuild,
   version: "0.17.11",
