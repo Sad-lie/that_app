@@ -22,6 +22,10 @@ defmodule ThatAppWeb.Router do
     live "/posts/new", PostLive.Index, :new
     live "/posts/:id/edit", PostLive.Index, :edit
 
+    live "/users", AuthLive.Auth, :index
+    live "/users/new", AuthLive.Auth, :new
+    live "/users/:id/edit", AuthLive.Auth, :edit
+
     live "/posts/:id", PostLive.Show, :show
     live "/posts/:id/show/edit", PostLive.Show, :edit
 
