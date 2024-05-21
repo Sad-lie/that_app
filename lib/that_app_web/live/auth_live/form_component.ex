@@ -57,22 +57,22 @@ defmodule ThatAppWeb.AuthLive.FormComponent do
     save_user(socket, socket.assigns.action, user_params)
   end
 
-  defp save_user(socket, :edit_user, user_params) do
-    case Accounts.update_user(socket.assigns.user, user_params) do
-      {:ok, user} ->
-        notify_parent({:saved, user})
+  # defp save_user(socket, :edit_user, user_params) do
+  #   case Accounts.update_user(socket.assigns.user, user_params) do
+  #     {:ok, user} ->
+  #       notify_parent({:saved, user})
 
-        {:noreply,
-         socket
-         |> put_flash(:info, "User updated successfully")
-        # |> push_patch(to: socket.assigns.patch)}
-        |> push_redirect(to: "/posts")}
+  #       {:noreply,
+  #        socket
+  #        |> put_flash(:info, "User updated successfully")
+  #       # |> push_patch(to: socket.assigns.patch)}
+  #       |> push_redirect(to: "/posts")}
 
 
-      {:error, %Ecto.Changeset{} = changeset} ->
-        {:noreply, assign_form(socket, changeset)}
-    end
-  end
+  #     {:error, %Ecto.Changeset{} = changeset} ->
+  #       {:noreply, assign_form(socket, changeset)}
+  #   end
+  # end
 
   defp save_user(socket, :log_in, user_params) do
     case Guardian.authenticate(user_params["email"], user_params["hash_password"]) do
@@ -149,8 +149,8 @@ defmodule ThatAppWeb.AuthLive.FormComponent do
         {:noreply,
          socket
          |> put_flash(:info, "User created successfully")
-         |> push_patch(to: socket.assigns.patch)}
-         |> push_redirect(to: "/posts")
+        # |> push_patch(to: socket.assigns.patch)}
+         |> push_redirect(to: "/posts")}
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign_form(socket, changeset)}
