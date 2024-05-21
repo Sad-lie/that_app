@@ -4,12 +4,18 @@ defmodule ThatAppWeb.PostLive.Show do
   alias ThatApp.Blogs
 
   @impl true
-  def mount(_params, _session, socket) do
+  def mount(params, session, socket) do
+    IO.puts("_________________this is mount show _______________-")
+    IO.inspect(params)
+    IO.inspect(session)
+    IO.inspect(socket)
     {:ok, socket}
   end
 
   @impl true
   def handle_params(%{"id" => id}, _, socket) do
+    IO.puts("_________________this is handle_params show _______________-")
+    IO.inspect(socket)
     {:noreply,
      socket
      |> assign(:page_title, page_title(socket.assigns.live_action))

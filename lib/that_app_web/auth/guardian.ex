@@ -18,12 +18,16 @@ defmodule ThatAppWeb.Auth.Guardian do
   def resource_from_claims(_claims) do
     {:error, :no_id_provided}
   end
+  def authenticate((%{"email" => email, "password" => password})) do
+    authenticate(email,password)
+  end
   def authenticate(email,password) do
-    case Accounts.get_user!(email) do
+    case Accounts.get_user_by_email(email) do
       nil -> {:error ,:unauthored}
       account ->
         case validate_password(password,account.hash_password) do
-          true -> create_token(account)
+          true ->  {:ok, account}
+           IO.puts("Account Verified")
           false -> {:error,:unauthored}
         end
     end
@@ -31,8 +35,31 @@ defmodule ThatAppWeb.Auth.Guardian do
   defp validate_password(password,hash_password)do
     Bcrypt.verify_pass(password,hash_password)
   end
-  defp create_token(account) do
-    {:ok ,token,_claims} = encode_and_sign(account)
-    {:ok,account,token}
+  # def create_token(account, claim ) do
+
+  #   {:ok ,token, claim } = encode_and_sign(account)
+  #   {:ok,account,token}
+  # end
+  def create_token(account, claims \\ %{}) do
+    claims = Map.merge(claims, %{
+      exp: DateTime.utc_now() |> DateTime.add(3600, :second) |> DateTime.to_unix(),
+      # Add other claims here
+    })
+
+    case encode_and_sign(account, %{}, claims) do
+      {:ok, token, _claims} ->
+        {:ok, token}
+      {:error, reason} ->
+        {:error, reason}
+    end
+  end
+
+  def decode_token(token) do
+    case decode_and_verify(token) do
+      {:ok, claims} ->
+        {:ok, claims}
+      {:error, reason} ->
+        {:error, reason}
+    end
   end
 end

@@ -1,34 +1,18 @@
 <.header>
-    Welcome to That App
+  Welcome to That App
   <:actions>
-    <.link patch={~p"/users/new"}>
-      <.button>New User</.button>
+    <.link patch={~p"/users/sign_up"}>
+      <.button>Sign Up</.button>
+    </.link>
+  </:actions>
+  <:actions>
+    <.link patch={~p"/users/log_in"}>
+      <.button>Log In</.button>
     </.link>
   </:actions>
 </.header>
 
-<%!-- <.table
-  id="users"
-  rows={@streams.users}
-  row_click={fn {_id, user} -> JS.navigate(~p"/users/#{user}") end}
-  >
-  <:col :let={{_id, user}} label="Name"><%= user.name %></:col>
-  <:col :let={{_id, user}} label="Email"><%= user.email %></:col>
-  <:col :let={{_id, user}} label="Description"><%= user.hash_password %></:col>
-  <:action :let={{_id, user}}>
-    <div class="sr-only">
-      <.link navigate={~p"/users/#{user}"}>Show</.link>
-    </div>
-    <.link patch={~p"/users/#{user}/edit"}>Edit</.link>
-  </:action>
-  <:action :let={{id, user}}>
-    <.link phx-click={JS.push("delete", value: %{id: user.id}) |> hide("##{id}")} data-confirm="Are you sure?">
-      Delete
-    </.link>
-  </:action>
-</.table> --%>
-
-<.modal :if={@live_action in [:new, :edit]} id="user-modal" show on_cancel={JS.patch(~p"/users")}>
+<.modal :if={@live_action in [:sign_up, :log_in]} id="user-modal" show on_cancel={JS.patch(~p"/users")}>
   <.live_component
     module={ThatAppWeb.AuthLive.FormComponent}
     id={@user.id || :new}
@@ -38,3 +22,59 @@
     patch={~p"/users"}
   />
 </.modal>
+
+
+<%!-- <.header>
+    Welcome to That App
+  <:actions>
+    <.link patch={~p"/users/sign_up"}>
+      <.button>Sign User</.button>
+    </.link>
+  </:actions>
+  <:actions>
+    <.link patch={~p"/users/log_in"}>
+      <.button>Login User</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.modal :if={@live_action in [:sign_up, :log_in]} id="user-modal" show on_cancel={JS.patch(~p"/users")}>
+  <.live_component
+    module={ThatAppWeb.AuthLive.FormComponent}
+    
+    id={@user.id || :new}
+    title={@page_title}
+    action={@live_action}
+    user={@user}
+    patch={~p"/users"}
+  />
+</.modal>
+
+ --%>
+
+
+<%!-- <div>
+  <h1>Sign Up</h1>
+  <%= f = form_for @changeset, "#", phx_change: "validate", phx_submit: "save" %>
+    <%= label f, :email %>
+    <%= email_input f, :email, required: true %>
+    <%= error_tag f, :email %>
+
+    <%= label f, :name %>
+    <%= text_input f, :name, required: true %>
+    <%= error_tag f, :name %>
+
+    <%= label f, :password %>
+    <%= password_input f, :password, required: true %>
+    <%= error_tag f, :password %>
+
+    <%= submit "Sign Up" %>
+  </form>
+</div> --%>
+<%!-- <.modal :if={@live_action in [:sign_up, :log_in]} id="user-modal" show on_cancel={JS.patch(~p"/users")}>
+  <%= if @user do %>
+    <.live_component module={ThatAppWeb.AuthLive.FormComponent} title={@page_title} action={@live_action} user={@user} patch={~p"/users"} />
+  <% else %>
+    <.live_component module={ThatAppWeb.AuthLive.FormComponent}  title={@page_title} action={@live_action} user={%{}} patch={~p"/users"} />
+  <% end %>
+</.modal> --%>

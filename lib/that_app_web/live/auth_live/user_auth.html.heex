@@ -1,0 +1,39 @@
+<%!-- <div>
+  <h1>Sign Up</h1>
+  <%= f = form_for @changeset, "#", phx_change: "validate", phx_submit: "save" %>
+    <%= label f, :email %>
+    <%= email_input f, :email, required: true %>
+    <%= error_tag f, :email %>
+
+    <%= label f, :name %>
+    <%= text_input f, :name, required: true %>
+    <%= error_tag f, :name %>
+
+    <%= label f, :password %>
+    <%= password_input f, :password, required: true %>
+    <%= error_tag f, :password %>
+
+    <%= submit "Sign Up" %>
+  </form>
+</div> --%>
+ <%!-- <div>
+      <.header>
+        <%= @title %>
+        <:subtitle>Use This Form</:subtitle>
+      </.header>
+
+      <.simple_form
+        for={@form}
+        id="-form"
+        phx-target={@myself}
+        phx-change="validate"
+        phx-submit="save"
+      >
+        <.input field={@form[:name]} type="text" label="Name" />
+        <.input field={@form[:email]} type="text" label="Email" />
+        <.input field={@form[:hash_password]} type="text" label="Password" />
+        <:actions>
+          <.button phx-disable-with="Saving...">Save User</.button>
+        </:actions>
+      </.simple_form>
+    </div> --%>

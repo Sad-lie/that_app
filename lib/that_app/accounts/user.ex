@@ -15,8 +15,8 @@ defmodule ThatApp.Accounts.User do
   @doc false
   def changeset(user,attrs) do
     user
-    |> cast(attrs, [:name ,:email,:hash_password])
-    |> validate_required([:name ,:email,:hash_password])
+    |> cast(attrs, [:name, :email, :hash_password])
+    |> validate_required([:name, :email, :hash_password])
     |> validate_format(:email, ~r/^[^\s]+@[^\s]+$/,message: "must have a @ and no space")
     |> validate_length(:email,max: 160)
     |> unique_constraint(:email)

@@ -37,6 +37,13 @@ defmodule ThatApp.Accounts do
   """
   def get_user!(id), do: Repo.get!(User, id)
 
+  def get_user_by_email(email) when is_binary(email) do
+    User
+    |> where([u], u.email == ^email)
+    |> Repo.one()
+  end
+
+
   @doc """
   Creates a user.
 
@@ -98,7 +105,12 @@ defmodule ThatApp.Accounts do
       %Ecto.Changeset{data: %User{}}
 
   """
+  # def change_user(%User{} = user, attrs \\ %{}) do
+  #   User.changeset(user, attrs)
+  # end
   def change_user(%User{} = user, attrs \\ %{}) do
     User.changeset(user, attrs)
   end
+
+
 end
