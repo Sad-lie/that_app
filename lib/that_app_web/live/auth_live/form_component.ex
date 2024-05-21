@@ -1,6 +1,7 @@
 defmodule ThatAppWeb.AuthLive.FormComponent do
   use ThatAppWeb, :live_component
 
+
   alias ThatApp.Accounts
   alias ThatApp.Accounts.User
   alias ThatAppWeb.Auth.Guardian
@@ -23,7 +24,7 @@ defmodule ThatAppWeb.AuthLive.FormComponent do
       >
         <.input field={@form[:name]} type="text" label="Name" />
         <.input field={@form[:email]} type="text" label="Email" />
-        <.input field={@form[:password]} type="password" label="Password" />
+        <.input field={@form[:hash_password]} type="password" label="Password" />
         <:actions>
           <.button phx-disable-with="Saving...">Save User</.button>
         </:actions>
@@ -64,7 +65,9 @@ defmodule ThatAppWeb.AuthLive.FormComponent do
         {:noreply,
          socket
          |> put_flash(:info, "User updated successfully")
-         |> push_patch(to: socket.assigns.patch)}
+        # |> push_patch(to: socket.assigns.patch)}
+        |> push_redirect(to: "/posts")}
+
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign_form(socket, changeset)}
@@ -72,21 +75,71 @@ defmodule ThatAppWeb.AuthLive.FormComponent do
   end
 
   defp save_user(socket, :log_in, user_params) do
-    case Guardian.authenticate(user_params) do
+    case Guardian.authenticate(user_params["email"], user_params["hash_password"]) do
       {:ok, user} ->
-        {:ok, token} = Guardian.create_token(user)
-        notify_parent({:saved, user})
+        case Guardian.create_token(user) do
+          {:ok, token} ->
+            notify_parent({:saved, user})
+            {:noreply,
+             socket
+             |> put_flash(:info, "User logged in successfully")
+             |> assign(:token, token)
+             #|> push_patch(to: socket.assigns.patch)
+             |> push_redirect(to: "/posts")}
 
-        {:noreply,
-         socket
-         |> put_flash(:info, "User logged in successfully")
-         |> assign(:token, token)
-         |> push_patch(to: socket.assigns.patch)}
+          {:error, reason} ->
+            IO.puts("Failed to create token: #{inspect(reason)}")
+            {:noreply,
+             socket
+             |> put_flash(:error, "Failed to log in. Please try again.")
+             |> assign(:token, nil)}
 
-      {:error, changeset} ->
+          unexpected ->
+            IO.puts("Unexpected return value from create_token: #{inspect(unexpected)}")
+            {:noreply,
+             socket
+             |> put_flash(:error, "An unexpected error occurred. Please try again.")
+             |> assign(:token, nil)}
+        end
+
+      {:error, :unauthorized} ->
+        changeset = Ecto.Changeset.add_error(
+          Ecto.Changeset.change(%{}),
+          :base,
+          "Invalid login credentials"
+        )
+        {:noreply, assign_form(socket, changeset)}
+
+      unexpected ->
+        IO.puts("Unexpected return value from authenticate: #{inspect(unexpected)}")
+        changeset = Ecto.Changeset.add_error(
+          Ecto.Changeset.change(%{}),
+          :base,
+          "An unexpected error occurred"
+        )
         {:noreply, assign_form(socket, changeset)}
     end
   end
+
+
+  # defp save_user(socket, :log_in, user_params) do
+  #   case Guardian.authenticate(user_params) do
+  #     {:ok, user} ->
+  #       {:ok, token} = Guardian.create_token(user)
+  #       notify_parent({:saved, user})
+
+
+  #       {:noreply,
+  #        socket
+  #        |> put_flash(:info, "User logged in successfully")
+  #        |> assign(:token, token)
+  #        |> push_patch(to: socket.assigns.patch)}
+  #        |> push_redirect(to: "/posts")
+
+  #     {:error, changeset} ->
+  #       {:noreply, assign_form(socket, changeset)}
+  #   end
+  # end
 
   defp save_user(socket, :sign_up, user_params) do
     case Accounts.create_user(user_params) do
@@ -97,6 +150,7 @@ defmodule ThatAppWeb.AuthLive.FormComponent do
          socket
          |> put_flash(:info, "User created successfully")
          |> push_patch(to: socket.assigns.patch)}
+         |> push_redirect(to: "/posts")
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign_form(socket, changeset)}
@@ -104,27 +158,15 @@ defmodule ThatAppWeb.AuthLive.FormComponent do
   end
 
   defp assign_form(socket, %Ecto.Changeset{} = changeset) do
-    IO.inspect(changeset)
     assign(socket, :form, to_form(changeset))
-
   end
 
-  # defp assign_form(socket, %{user: user}) do
-  #   changeset = Accounts.change_user(user)
-  #   assign(socket, form: changeset)
-  # end
+  defp assign_form(socket, changeset) do
+    IO.inspect(changeset)
+    assign(socket, :form, nil)
+  end
 
-  # # Add more function clauses if needed
-  # defp assign_form(socket, %{}) do
-  #   changeset = Accounts.change_user(%ThatApp.Accounts.User{})
-  #   assign(socket, form: changeset)
-  # end
 
-  # # Catch-all clause to handle unexpected arguments
-  # defp assign_form(socket, _assigns) do
-  #   changeset = Accounts.change_user(%ThatApp.Accounts.User{})
-  #   assign(socket, form: changeset)
-  # end
 
   defp notify_parent(msg), do: send(self(), {__MODULE__, msg})
 end

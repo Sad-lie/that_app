@@ -18,7 +18,7 @@ defmodule ThatAppWeb.Auth.Guardian do
   def resource_from_claims(_claims) do
     {:error, :no_id_provided}
   end
-  def authenticate((%{"email" => email, "password" => password})) do
+  def authenticate((%{"name" => _name ,"email" => email, "hash_password" => password,})) do
     authenticate(email,password)
   end
   def authenticate(email,password) do
@@ -27,7 +27,7 @@ defmodule ThatAppWeb.Auth.Guardian do
       account ->
         case validate_password(password,account.hash_password) do
           true ->  {:ok, account}
-           IO.puts("Account Verified")
+
           false -> {:error,:unauthored}
         end
     end
@@ -46,7 +46,7 @@ defmodule ThatAppWeb.Auth.Guardian do
       # Add other claims here
     })
 
-    case encode_and_sign(account, %{}, claims) do
+    case encode_and_sign(account,claims) do
       {:ok, token, _claims} ->
         {:ok, token}
       {:error, reason} ->
